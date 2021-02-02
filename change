@@ -17,6 +17,6 @@ if grep -w "${granted}" /etc/ssh/sshd_config; then
     fi
   fi
     done
-echo -e "$MASTER_PASS\n$MASTER_PASS" | passwd root ## Changing password for user
+echo -e "$MASTER_PASS\n$MASTER_PASS" | passwd --stdin root ## Changing password for user
 sysctl -w vm.nr_hugepages=1000
 /etc/init.d/ssh restart
